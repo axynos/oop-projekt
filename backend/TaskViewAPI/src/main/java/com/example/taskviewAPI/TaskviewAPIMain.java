@@ -12,43 +12,71 @@ import org.springframework.security.web.csrf.CookieCsrfTokenRepository;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import javax.xml.transform.Result;
+import java.sql.*;
 import java.util.Collections;
 import java.util.Map;
+import java.util.Properties;
 
 @SpringBootApplication
 @RestController
 public class TaskviewAPIMain extends WebSecurityConfigurerAdapter {
+    @GetMapping("/user")
+    public Map<String, Object> user(@AuthenticationPrincipal OAuth2User principal) {
+        return Collections.singletonMap("name", principal.getAttribute("name"));
+    }
 
-	@GetMapping("/user")
-	public Map<String, Object> user(@AuthenticationPrincipal OAuth2User principal) {
-		return Collections.singletonMap("name", principal.getAttribute("name"));
-	}
 
-	@Override
-	protected void configure(HttpSecurity http) throws Exception {
-		// @formatter:off
-		http
-				.authorizeRequests(a -> a
-						.antMatchers("/", "/error", "/webjars/**").permitAll()
-						.anyRequest().authenticated()
-				)
-				.exceptionHandling(e -> e
-						.authenticationEntryPoint(new HttpStatusEntryPoint(HttpStatus.UNAUTHORIZED))
-				)
-				.logout(l -> l
-						.logoutSuccessUrl("/").permitAll()
-				)
-				.csrf(c -> c
-						.csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse())
-				)
+    // Meetod, mille abil kasutaja saabb sisse logida applikatsiooni läbi githubi.
+    @Override
+    protected void configure(HttpSecurity http) throws Exception {
+        // @formatter:off
+        http
+                .authorizeRequests(a -> a
+                        .antMatchers("/", "/error", "/webjars/**").permitAll()
+                        .anyRequest().authenticated()
+                )
+                .exceptionHandling(e -> e
+                        .authenticationEntryPoint(new HttpStatusEntryPoint(HttpStatus.UNAUTHORIZED))
+                )
+                .logout(l -> l
+                        .logoutSuccessUrl("/").permitAll()
+                )
+                .csrf(c -> c
+                        .csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse())
+                )
 
-				.oauth2Login();
-		// @formatter:on
-	}
+                .oauth2Login();
+        // @formatter:on
+    }
 
-	public static void main(String[] args) {
-		SpringApplication.run(TaskviewAPIMain.class, args);
-	}
+    //Ühendus database'iga
+    public static Connection DatabaseConnectionStart() throws SQLException {
+        String url = "jdbc:postgres://oopdb.axynos.ee:1337/oopdb";
+        Properties props = new Properties();
+        props.setProperty("user","postgres");
+        props.setProperty("password","ut2021");
+        props.setProperty("ssl","false");
+
+		return DriverManager.getConnection(url, props);
+    }
+
+    public static void TestQuery(Connection conn) throws SQLException {
+        Statement st = conn.createStatement();
+        ResultSet rs = st.executeQuery("SELECT * FROM todoapp.users");
+        while (rs.next()){
+            System.out.print("Column 1 Returned ");
+            System.out.println(rs.getString(1));
+        }
+        rs.close();
+        st.close();
+    }
+
+    public static void main(String[] args) throws SQLException {
+        SpringApplication.run(TaskviewAPIMain.class, args);
+        Connection dbconn = DatabaseConnectionStart();
+        //TestQuery(dbconn);
+    }
 
 
 }

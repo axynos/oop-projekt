@@ -21,13 +21,27 @@ import java.util.Properties;
 @SpringBootApplication
 @RestController
 public class TaskviewAPIMain extends WebSecurityConfigurerAdapter {
+    //
     @GetMapping("/user")
     public Map<String, Object> user(@AuthenticationPrincipal OAuth2User principal) {
-        return Collections.singletonMap("name", principal.getAttribute("name"));
+        return Collections.singletonMap("id", principal.getAttribute("id"));
+    }
+// request. annab tagasi variable errori -> check why and possible fix. - HasieEST
+
+//    @GetMapping("/error")
+//    public String error() {
+//        String message = (String) request.getSession().getAttribute("error.message");
+//        request.getSession().removeAttribute("error.message");
+//        return message;
+//    }
+
+
+    protected void kasKasutaja(String userid){
+
     }
 
 
-    // Meetod, mille abil kasutaja saabb sisse logida applikatsiooni läbi githubi.
+    // Meetod, mille abil kasutaja saab sisse logida applikatsiooni läbi githubi.
     @Override
     protected void configure(HttpSecurity http) throws Exception {
         // @formatter:off
@@ -45,22 +59,27 @@ public class TaskviewAPIMain extends WebSecurityConfigurerAdapter {
                 .csrf(c -> c
                         .csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse())
                 )
-
                 .oauth2Login();
+//                .oauth2Login(o -> o
+//                        .failureHandler((request, response, exception) -> {
+//                            request.getSession().setAttribute("error.message", exception.getMessage());
+//                            handler.onAuthenticationFailure(request, response, exception);
+//                        })
+//                );
         // @formatter:on
     }
 
     //Ühendus database'iga
     public static Connection DatabaseConnectionStart() throws SQLException {
-        String url = "jdbc:postgres://oopdb.axynos.ee:1337/oopdb";
+        String url = "jdbc:postgresql://oopdb.axynos.ee:5432/oopdb";
         Properties props = new Properties();
         props.setProperty("user","postgres");
-        props.setProperty("password","ut2021");
+        props.setProperty("password","");
         props.setProperty("ssl","false");
 
 		return DriverManager.getConnection(url, props);
     }
-
+    //TestQuery, kontrollimiseks kas tagastus on olemas
     public static void TestQuery(Connection conn) throws SQLException {
         Statement st = conn.createStatement();
         ResultSet rs = st.executeQuery("SELECT * FROM todoapp.users");

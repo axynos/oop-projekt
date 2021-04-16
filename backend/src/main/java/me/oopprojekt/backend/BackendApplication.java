@@ -74,7 +74,7 @@ public class BackendApplication extends WebSecurityConfigurerAdapter {
     @GetMapping("/user")
     @ResponseBody
     public Map<String, Object> user(@AuthenticationPrincipal OAuth2User principal) {
-        return Collections.singletonMap("name", principal.getAttribute("name"));
+        return Collections.singletonMap("id", principal.getAttribute("id"));
     }
 
     @GetMapping("/error")
@@ -113,8 +113,12 @@ public class BackendApplication extends WebSecurityConfigurerAdapter {
         // @formatter:on
     }
 
+    protected void databaseconfig()throws Exception {
+
+    }
+
+
     public static void main(String[] args) {
         SpringApplication.run(BackendApplication.class, args);
     }
-
 }

@@ -1,5 +1,6 @@
 package me.oopprojekt.backend;
 
+import java.sql.SQLException;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
@@ -32,6 +33,9 @@ import org.springframework.web.reactive.function.client.WebClient;
 
 import static org.springframework.security.oauth2.client.web.reactive.function.client.ServletOAuth2AuthorizedClientExchangeFilterFunction.oauth2AuthorizedClient;
 
+import me.oopprojekt.backend.database.DBData;
+import me.oopprojekt.backend.database.User;
+
 @SpringBootApplication
 @Controller
 public class BackendApplication extends WebSecurityConfigurerAdapter {
@@ -44,37 +48,53 @@ public class BackendApplication extends WebSecurityConfigurerAdapter {
                 .filter(oauth2).build();
     }
 
-    @Bean
-    public OAuth2UserService<OAuth2UserRequest, OAuth2User> oauth2UserService(WebClient rest) {
-        DefaultOAuth2UserService delegate = new DefaultOAuth2UserService();
-        return request -> {
-            OAuth2User user = delegate.loadUser(request);
-            if (!"github".equals(request.getClientRegistration().getRegistrationId())) {
-                return user;
-            }
-
-            OAuth2AuthorizedClient client = new OAuth2AuthorizedClient
-                    (request.getClientRegistration(), user.getName(), request.getAccessToken());
-            String url = user.getAttribute("organizations_url");
-            List<Map<String, Object>> orgs = rest
-                    .get().uri(url)
-                    .attributes(oauth2AuthorizedClient(client))
-                    .retrieve()
-                    .bodyToMono(List.class)
-                    .block();
-
-            if (orgs.stream().anyMatch(org -> "spring-projects".equals(org.get("login")))) {
-                return user;
-            }
-
-            throw new OAuth2AuthenticationException(new OAuth2Error("invalid_token", "Not in Spring Team", ""));
-        };
-    }
+//    @Bean
+//    public OAuth2UserService<OAuth2UserRequest, OAuth2User> oauth2UserService(WebClient rest) {
+//        DefaultOAuth2UserService delegate = new DefaultOAuth2UserService();
+//        return request -> {
+//            OAuth2User user = delegate.loadUser(request);
+//            if (!"github".equals(request.getClientRegistration().getRegistrationId())) {
+//                return user;
+//            }
+//
+//            OAuth2AuthorizedClient client = new OAuth2AuthorizedClient
+//                    (request.getClientRegistration(), user.getName(), request.getAccessToken());
+//            String url = user.getAttribute("organizations_url");
+//            List<Map<String, Object>> orgs = rest
+//                    .get().uri(url)
+//                    .attributes(oauth2AuthorizedClient(client))
+//                    .retrieve()
+//                    .bodyToMono(List.class)
+//                    .block();
+//
+//            if (orgs.stream().anyMatch(org -> "spring-projects".equals(org.get("login")))) {
+//                return user;
+//            }
+//
+//            throw new OAuth2AuthenticationException(new OAuth2Error("invalid_token", "Not in Spring Team", ""));
+//        };
+//    }
 
     @GetMapping("/user")
     @ResponseBody
     public Map<String, Object> user(@AuthenticationPrincipal OAuth2User principal) {
         return Collections.singletonMap("id", principal.getAttribute("id"));
+    }
+
+    @GetMapping("/test")
+    @ResponseBody
+    public String test() {
+        DBData db;
+        User user = new User();
+
+        try {
+            db = new DBData();
+            db.insertUser("Mari Maasikas", "https://example.com/example.png");
+        } catch (SQLException | ClassNotFoundException e) {
+            e.printStackTrace();
+        }
+
+        return "test";
     }
 
     @GetMapping("/error")
@@ -112,11 +132,6 @@ public class BackendApplication extends WebSecurityConfigurerAdapter {
                 );
         // @formatter:on
     }
-
-    protected void databaseconfig()throws Exception {
-
-    }
-
 
     public static void main(String[] args) {
         SpringApplication.run(BackendApplication.class, args);

@@ -41,7 +41,7 @@ public class Tasks implements AppActions {
     }
 
     @Override
-    public void commentTask(String taskID, String comment) {
+    public void commentTask(String taskID, String comment, String userID) {
 
     }
 

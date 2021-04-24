@@ -5,7 +5,7 @@ public interface AppActions {
     void removeTask(String taskID);
     void modifyTaskTitle(String taskID, String taskTitle);
     void modifyTaskContent(String taskID, String taskContent);
-    void commentTask(String taskID, String comment);
+    void commentTask(String taskID, String comment, String userID);
     void modifyTaskStartTime(String taskID, String startTime);
     void modifyTaskEndTime(String taskID, String endTime);
 }

@@ -1,20 +1,16 @@
 package front.main;
 
 import javafx.application.Application;
-import javafx.scene.Group;
 import javafx.scene.Scene;
-import javafx.scene.layout.VBox;
-import javafx.scene.text.Text;
 import javafx.stage.Stage;
 
 public class Main extends Application {
     @Override
     public void start(Stage stage) throws Exception {
-        Group root = new Group();
-        Text text = new Text("Hello World");
-        root.getChildren().add(new VBox(text));
+        Layout layout = new Layout();
+        layout.run();
 
-        Scene scene = new Scene(root, 1200, 800);
+        Scene scene = new Scene(layout, 1280, 720);
         stage.setTitle("TaskView");
         stage.setScene(scene);
         stage.show();

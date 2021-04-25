@@ -56,7 +56,7 @@ public class TopBar extends HBox implements Runnable {
         userOptions.getItems().add(new MenuItem("Log out"));
         topBarRight.getChildren().add(userOptions);
 
-        StackPane avatar = makeAvatar("UN", 20.0);
+        StackPane avatar = new Avatar(20.0, "UN");
         topBarRight.getChildren().add(avatar);
 
         getChildren().addAll(topBarLeft, topBarRight);

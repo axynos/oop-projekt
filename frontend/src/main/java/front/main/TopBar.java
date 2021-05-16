@@ -1,10 +1,7 @@
 package front.main;
 
 import javafx.geometry.Pos;
-import javafx.scene.control.ComboBox;
-import javafx.scene.control.MenuItem;
-import javafx.scene.control.SplitMenuButton;
-import javafx.scene.control.TextField;
+import javafx.scene.control.*;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.StackPane;
@@ -19,6 +16,7 @@ public class TopBar extends HBox implements Runnable {
     private ComboBox<String> tagsSelect;
     private ComboBox<String> personSelect;
     private TextField searchBox;
+    private Button newTask;
     private SplitMenuButton userOptions;
 
     @Override
@@ -49,6 +47,10 @@ public class TopBar extends HBox implements Runnable {
         searchBox = new TextField();
         searchBox.setPromptText("Search");
         topBarLeft.getChildren().add(searchBox);
+
+        newTask = new Button();
+        newTask.setText("New Task");
+        topBarRight.getChildren().add(newTask);
 
         userOptions = new SplitMenuButton();
         userOptions.setText("User Name");

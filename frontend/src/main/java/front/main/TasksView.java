@@ -23,9 +23,9 @@ public class TasksView extends GridPane implements Runnable {
         VBox[] cols = new VBox[] {col1, col2, col3};
         for (VBox col : cols) {
             for (int i = 0; i < 5; i++) {
-                Task task = new Task("Lorem ipsum", "Design", lorem, assignedPeople);
-                task.run();
-                col.getChildren().add(task);
+                Task_FX taskFX = new Task_FX("Lorem ipsum", "Design", lorem, assignedPeople);
+                taskFX.run();
+                col.getChildren().add(taskFX);
             }
         }
 
